@@ -47,6 +47,8 @@ classdef AlgorithmicMDH
                 LG_i_next_i = LineGeometry(obj.L_list{i},obj.L_list{i+1},obj.epsilon);
                 [alpha_prev_i_i,a_prev_i_i,n_prev_i_i,t_prev_i_prev_i,t_prev_i_i]=LG_prev_i_i.get_parameters();
                 [alpha_i_next_i,a_i_next_i,n_i_next_i,t_i_i,t_i_next_i]=LG_i_next_i.get_parameters();
+                % drawLineGeometry(LG_prev_i_i);hold on;
+                LG_i_next_i
                 z_prev_i = LG_prev_i_i.L1.z_hat;
                 z_i = LG_prev_i_i.L2.z_hat;
                 obj.LG_list{i-1}=LG_prev_i_i;

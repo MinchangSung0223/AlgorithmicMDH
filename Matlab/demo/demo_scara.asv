@@ -1,0 +1,50 @@
+restoredefaultpath
+addpath("../")
+addpath("../utils")
+close all;
+
+load scara.mat % you can get line parameters using "utils/URDF2Line.py" file
+
+epsilon = 0.0000001;
+urdf_path = "../urdf/scara/scara_noisy.urdf"
+
+[x0,z_list,p_list] = URDF2Line(urdf_path);
+z_list =
+q = randomConfiguration(robot)*0.0;
+
+ax=show(robot,q,'Frames','on');hold on;
+
+ret=AlgorithmicMDH(z_list,p_list,x0,epsilon);
+printMDH(ret.MDH)
+% Relation = [ret.LG_list{1}.type_str,', ',ret.LG_list{2}.type_str,', ',ret.LG_list{3}.type_str,', ',ret.LG_list{4}.type_str]
+figure;
+robot = importrobot(urdf_path);
+robot.DataFormat='column';
+drawMDH_q(ret.MDH,q)
+axis tight;
+T = getTransform(robot,q,"tcp","world");
+prev_L =Line(z_list{1},p_list{1});
+
+i=2
+    L = Line(z_list{i},p_list{i});
+    % drawLine(L,"L"+string(i)); hold on;
+    LG = LineGeometry(L,prev_L,0.00001);
+drawLineGeometry(LG)
+
+[Ti_list,T_tcf]=ForwardKinematicsMDH(ret.MDH,q,[1,1,1,2]);
+
+for i = 1:length(ax.Children)
+    if isprop(ax.Children(i), 'FaceAlpha')
+        ax.Children(i).FaceAlpha = 0.3;  % 예: 30% 불투명
+    end
+end
+
+norm(inv(T)*T_tcf-eye(4))
+
+
+function drawLine(L1,line_name)
+    quiver3([L1.p(1)],[L1.p(2)],[L1.p(3)],[L1.z_hat(1)],[L1.z_hat(2)],[L1.z_hat(3)],'Color','blue') ;hold on;
+    line([L1.p(1)-L1.z_hat(1),L1.p(1)+L1.z_hat(1)],[L1.p(2)-L1.z_hat(2),L1.p(2)+L1.z_hat(2)],[L1.p(3)-L1.z_hat(3),L1.p(3)+L1.z_hat(3)],"LineStyle",':');
+    plot3(L1.p(1),L1.p(2),L1.p(3),'k.');
+    text(L1.p(1)+L1.z_hat(1),L1.p(2)+L1.z_hat(2),L1.p(3)+L1.z_hat(3),line_name,'Interpreter','latex')
+end

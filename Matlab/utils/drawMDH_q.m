@@ -1,6 +1,6 @@
-function drawMDH(MDH)
+function drawMDH_q(MDH,q)
     N=length(MDH.a);
-    thetalist = zeros(N,1);
+    thetalist = q;
     [Ti_list,T_tcf]=ForwardKinematicsMDH(MDH,thetalist);
     for i=1:1:length(Ti_list)
         Ti=Ti_list{i};
